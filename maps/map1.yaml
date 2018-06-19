@@ -1,0 +1,13 @@
+image: map1.png
+#resolution: 0.1
+#origin: [-372.5, -208.4, 0.0]
+resolution: 0.5
+origin: [0, 0, 0]
+#origin: [-269.5, -103.5, 0]
+#Betancourt bike entrance origin: [-327.0, -128.0, 0]
+#cooler tower origin: [-340.0, -131.0, 0]
+#nave -> -247.7, -76.3, 0.0
+#bumper [-26, -76.3, 0.0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196

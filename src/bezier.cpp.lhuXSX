@@ -1,0 +1,429 @@
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+#include <stdio.h>
+#include <math.h>
+#include <visualization_msgs/Marker.h>
+#include <nav_msgs/Path.h>
+#include <cmath>
+#include <math.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <iostream>
+#include <tf/transform_listener.h>
+#include <nav_msgs/Odometry.h>
+
+
+#define PI 3.14159265
+
+
+#define ARRAY_SIZE(x) (sizeof((x))/sizeof((x)[0]))
+
+using namespace std;
+
+double outputs[2048];
+double x_transformada;
+double y_transformada;
+
+nav_msgs::Path path_map;
+geometry_msgs::PoseStamped goal_point;
+nav_msgs::OccupancyGrid map_;
+nav_msgs::Odometry current_odom;
+
+bool goal_init = false;
+bool map_init = false;
+
+double factorialLookup[33] = {
+    1.0,
+    1.0,
+    2.0,
+    6.0,
+    24.0,
+    120.0,
+    720.0,
+    5040.0,
+    40320.0,
+    362880.0,
+    3628800.0,
+    39916800.0,
+    479001600.0,
+    6227020800.0,
+    87178291200.0,
+    1307674368000.0,
+    20922789888000.0,
+    355687428096000.0,
+    6402373705728000.0,
+    121645100408832000.0,
+    2432902008176640000.0,
+    51090942171709440000.0,
+    1124000727777607680000.0,
+    25852016738884976640000.0,
+    620448401733239439360000.0,
+    15511210043330985984000000.0,
+    403291461126605635584000000.0,
+    10888869450418352160768000000.0,
+    304888344611713860501504000000.0,
+    8841761993739701954543616000000.0,
+    265252859812191058636308480000000.0,
+    8222838654177922817725562880000000.0,
+    263130836933693530167218012160000000.0
+};
+
+// just check if n is appropriate, then return the result
+double factorial( int n ) {
+
+    if ( n < 0 ) { printf( "ERROR: n is less than 0\n" ); }
+    if ( n > 32 ) { printf( "ERROR: n is greater than 32\n" ); }
+
+    return factorialLookup[n]; /* returns the value n! as a SUMORealing point number */
+}
+
+double Ni( int n, int i ) {
+    double ni;
+    double a1 = factorial( n );
+    double a2 = factorial( i );
+    double a3 = factorial( n - i );
+    ni =  a1 / ( a2 * a3 );
+    return ni;
+}
+
+// Calculate Bernstein basis
+double Bernstein( int n, int i, double t ) {
+    double basis;
+    double ti; /* t^i */
+    double tni; /* (1 - t)^i */
+
+    /* Prevent problems with pow */
+
+    if ( t == 0.0 && i == 0 ) {
+        ti = 1.0;
+    } else {
+        ti = pow( t, i );
+    }
+    if ( n == i && t == 1.0 ) {
+        tni = 1.0;
+    } else {
+        tni = pow( ( 1 - t ), ( n - i ) );
+    }
+    //Bernstein basis
+    basis = Ni( n, i ) * ti * tni;
+    return basis;
+}
+
+void Bezier2D( double b[], int bCount, int cpts, double p[] ) {
+    int npts = bCount / 2;
+    int icount, jcount;
+    double step, t;
+
+    // Calculate points on curve
+
+    icount = 0;
+    t = 0;
+    step = (double)1.0 / ( cpts - 1 );
+
+    for ( int i1 = 0; i1 != cpts; i1++ ) {
+        if ((1.0 - t) < 5e-6) {
+            t = 1.0;
+        }
+        jcount = 0;
+        p[icount] = 0.0;
+        p[icount + 1] = 0.0;
+        for ( int i = 0; i != npts; i++ ) {
+            double basis = Bernstein(npts - 1, i, t);
+            p[icount] += basis * b[jcount];
+            p[icount + 1] += basis * b[jcount + 1];
+            jcount = jcount +2;
+        }
+
+        icount += 2;
+        t += step;
+    }
+}
+
+
+void goalPointCallback_sub(const geometry_msgs::PoseStampedConstPtr& goal_msg )
+{
+  goal_point = *goal_msg;  // goal_msgs.pose.position.x / .y/ .z /// tf::quaternion2theta
+  goal_init = true;
+}
+
+void mapCallback(const nav_msgs::OccupancyGrid::ConstPtr& map_msg )
+{
+  map_ = *map_msg;
+  map_init = true;
+}
+
+void odomCallback(const nav_msgs::OdometryConstPtr& odom_msg)
+{
+  current_odom = *odom_msg;
+}
+
+nav_msgs::Path generate_path(geometry_msgs::PoseStamped goal_point, geometry_msgs::PoseStamped current_odom, geometry_msgs::PoseStamped auxiliar_point)
+{
+  nav_msgs::Path my_path;
+  // generate trayectory
+  return my_path;
+}
+
+bool check_obstacles(nav_msgs::Path trajectory, nav_msgs::OccupancyGrid map_)
+{
+  bool obstacle_free = false;
+
+  for (trajectory_waypoint)
+  {
+    if(map_.data[trajectory_waypoint_cell] != 0)
+    {
+      return false;
+    }
+  }
+  // check obstacles in the trajectory
+
+  return true;
+}
+
+/*void mapCallback(const nav_msgs::OccupancyGrid::ConstPtr& map )
+{
+    int index = 0;
+    float x = 0;
+    float y = 0;
+    int grid_x;
+    int grid_y;
+
+  //ROS_INFO("I heard: [%f]", map->data[0]);
+    //ROS_INFO("El valor del output es: [%f]",  path_map.poses[20].pose.position.x); //uint32 width
+    for (int i=0; i<1024; i++){
+        x = path_map.poses[i].pose.position.x;
+        y = path_map.poses[i].pose.position.y;
+
+        grid_x = x / 0.158 + 1345;
+        grid_y = y / 0.158 + 955;
+
+        index  = (grid_y*2651 + grid_x);
+
+        if(map->data[index] != 0){
+            ROS_INFO("Hay un obstáculo en [%f]",  x, y);
+        }
+        //map->data[i,j]
+
+    }
+
+
+    /*
+    for(int x=0; x<= map->info.width; x++){
+        for(int y=0; y<= map->info.height; y++){
+            index ++;
+            if (x == x_goal && y == y_goal){
+                map->data[index]
+
+            }
+        }
+    }
+    */
+//}
+
+int main(int argc, char **argv)
+{
+
+
+    //double outputs[2048];
+    // advanced curve
+    /*double inputs[8] = {
+        0, 0.0,
+        50, 100.0,
+        0, 195.0,
+        0, 200.0
+    };*/
+
+   Bezier2D( inputs, ARRAY_SIZE( inputs ), 1024, outputs );
+
+   /* for ( int x = 0; x < 2048; x += 2 ) {
+        printf( "%li\t%li\n", (long)outputs[x], (long)outputs[x+1] );
+    }*/
+
+
+    //Hasta aquí el código pegado
+    ros::init(argc, argv, "bezier");
+    ros::NodeHandle nh;
+
+    ros::Publisher chatter_pub = nh.advertise<visualization_msgs::Marker>("chatter", 1000);
+    ros::Publisher chatter_pub_path = nh.advertise<nav_msgs::Path>("chatter_path", 1000);
+    ros::Publisher chatter_map_path = nh.advertise<nav_msgs::Path>("chatter_path_map", 1000);
+    ros::Publisher check_pub =  nh.advertise<std_msgs::String>("check", 1000);
+
+    ros::Subscriber map = nh.subscribe("map", 1000, mapCallback);
+    ros::Subscriber goalPointCallback_sub = nh.subscribe("/move_base_simple/goal", 1000, goalPointCallback);
+    ros::Subscriber current_odom = nh.subscribe("current_odom", 1000, odomCallback);
+
+
+
+
+
+    ros::Rate loop_rate(10);
+
+    tf::TransformListener listener;
+
+    geometry_msgs::PoseStamped auxiliar_point;
+    bool obstacle_free = true;
+
+    while (ros::ok())
+    {
+      ros::spinOnce();
+
+      if(!map_init && !goal_init)
+      {
+            cout << "waiting goal or map" << endl;
+      }
+      else
+      {
+          // generate path
+        trajectory = generate_path(goal_point, current_odom, auxiliar_point); // current_odom.pose.pose.position.x
+        obstacle_free = check_obstacles(trajectory, map_);  // map.info.width // map.info.height // map.info.resolution
+
+
+        if (!obstacle_free) // trajectory not valid
+        {
+          // add new auxiliary point
+
+        }
+        else // trajectory valid
+        {
+          // publish trajectory
+        }
+      }
+
+      loop_rate.sleep();
+
+
+
+        //TRANSFORMADA
+    tf::StampedTransform transform;
+     try{
+       listener.lookupTransform("/map", "/base_link",
+                                ros::Time(0), transform);
+     }
+     catch (tf::TransformException &ex) {
+       ROS_ERROR("%s",ex.what());
+       ros::Duration(1.0).sleep();
+       continue;
+     }
+
+
+    std::stringstream ss;
+    std::stringstream check;
+	
+	//Defino points
+	visualization_msgs::Marker points;
+    //Defino path
+    nav_msgs::Path path;
+    //nav_msgs::Path path_map;
+
+
+
+    points.header.frame_id  = "/base_link";
+    points.header.stamp = ros::Time::now();
+    points.ns = "bezier";
+    points.action =  visualization_msgs::Marker::ADD;
+    points.pose.orientation.w = 1.0;
+
+    points.id = 0;
+    points.type = visualization_msgs::Marker::POINTS;
+
+    //x and y width
+    points.scale.x = 0.2;
+    points.scale.y = 0.2;
+
+    // Points are green
+    points.color.g = 1.0f;
+    points.color.a = 1.0;
+
+    path.header.frame_id = "base_link";
+    path.header.stamp = ros::Time::now();
+
+    path_map.header.frame_id = "map";
+    path_map.header.stamp = ros::Time::now();
+
+
+
+        //Me devuelve las x y las y. En forma de string
+        std_msgs::String msgx;
+        std_msgs::String msgy;
+
+        //En forma de geometry_msgs
+        geometry_msgs::Point p;
+        geometry_msgs::PoseStamped pose;
+
+        geometry_msgs::PoseStamped pose_map;
+
+
+        /*
+        p.x = (int32_t)i - 50;
+        p.y = y;
+        p.z = z;
+        */
+
+
+        for ( int x = 0; x < 2048; x += 2 ) {
+            //printf( "%li\t%li\n", (long)outputs[x], (long)outputs[x+1] );
+            //ss << (long)outputs[x]+ " "+ (long)outputs[x+1];
+            //ss << (long)outputs[x+1];
+            //msgy.data = ss.str();
+
+            p.x = outputs[x];
+            p.y = outputs[x+1];
+            p.z = 0;
+            double angle = 0;
+
+            //Por cuaternios
+
+            //double w = cos (0.5*angle*PI/180);
+            //double x = p.x * sin (0.5*angle*PI/180);
+            //double y = p.y * sin (0.5*angle*PI/180);
+            //double z = p.z * sin (0.5*angle*PI/180);
+
+            pose.pose.position.x = outputs[x];
+            pose.pose.position.y = outputs[x+1];
+            pose.pose.position.z = 0;
+
+            pose.pose.orientation.x = 0;
+            pose.pose.orientation.y = 0;
+            pose.pose.orientation.z = 0;
+            pose.pose.orientation.w = 1.0; //Significa que no hay rotación.
+
+            //Otro sistema de poses en referencia a /map
+            pose_map.pose.position.x = pose.pose.position.x + transform.getOrigin().x();
+            pose_map.pose.position.y = pose.pose.position.y + transform.getOrigin().y();
+            pose_map.pose.position.z = pose.pose.position.z + transform.getOrigin().z();
+
+            pose_map.pose.orientation.x = 0;
+            pose_map.pose.orientation.y = 0;
+            pose_map.pose.orientation.z = 0;
+            pose_map.pose.orientation.w = 1.0;
+
+
+            points.points.push_back(p);
+            path.poses.push_back(pose);
+            path_map.poses.push_back(pose_map);
+
+            x_transformada = pose_map.pose.position.x;
+            y_transformada = pose_map.pose.position.y;
+
+
+            //path.poses[].pose.position
+
+            //chatter_pub.publish(msgy);
+        }
+
+
+        //marker_pub.publish(points);
+
+
+        chatter_pub.publish(points);
+        chatter_pub_path.publish(path);
+        chatter_map_path.publish(path_map);
+        
+
+        //marker_pub.publish(points);
+
+    }
+
+    return 0;
+}

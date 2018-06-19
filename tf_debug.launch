@@ -1,0 +1,16 @@
+<launch>
+	<node pkg="tf" type="static_transform_publisher" name="base_link" args="0 0 0 0 0 0 /odom /base_link 2"  output="screen"/>
+	<node pkg="tf" type="static_transform_publisher" name="initial_loc" args="25 25 0 0 0 0 /map /odom 2"  output="screen"/>
+
+	<!-- global map, sShould be outside of the namespace -->
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find tfg_final)/maps/map1.yaml" output="screen">
+		<param name="frame_id" value="map"/>
+	</node>
+    <!--  **************** Visualisation ****************  -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tfg_final)/config/glbalplan5.rviz">
+        <remap from="/move_base_simple/goal" to="move_base_simple/goal" />
+        <remap from="/initialpose" to="initialpose" />
+    </node>
+
+
+</launch>
