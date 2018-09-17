@@ -20,7 +20,7 @@
 
 using namespace std;
 
-double outputs[2048]; //Por qué está aqui?
+double outputs[2048];
 double x_transformada;
 double y_transformada;
 //int aux_count = 0;
@@ -462,7 +462,7 @@ bool check_obstacles(nav_msgs::Path trajectory, nav_msgs::OccupancyGrid map_, ge
   //for(trajectory_waypoint_cell){
 
 
-    for(int i=0; i<2000; i++){ //tengo que ampliar a más iteraciones
+    for(int i=0; i<1000; i++){ //tengo que ampliar a más iteraciones
 
        x_coordinate = trajectory.poses[i].pose.position.x;
        y_coordinate = trajectory.poses[i].pose.position.y;
@@ -503,7 +503,6 @@ bool check_obstacles(nav_msgs::Path trajectory, nav_msgs::OccupancyGrid map_, ge
 
            while(static_cast<int16_t>(map_.data[index]) !=0);
 
-
            aux_pose.position.x = aux_pose.position.x - transform.getOrigin().x(); //Tengo que sumar la posicion del punto intermedio
            aux_pose.position.y = aux_pose.position.y - transform.getOrigin().y();
 
@@ -521,11 +520,7 @@ bool check_obstacles(nav_msgs::Path trajectory, nav_msgs::OccupancyGrid map_, ge
 
        }
     }
-
-
 }
-
-
 
 /*void mapCallback(const nav_msgs::OccupancyGrid::ConstPtr& map )
 {
@@ -666,6 +661,7 @@ int main(int argc, char **argv)
       //TRANSFORMADA
       tf::StampedTransform transform;
        try{
+         listener.waitForTransform("/map", "/base_link", ros::Time(0), ros::Duration(50.0));
          listener.lookupTransform("/map", "/base_link",
                                   ros::Time(0), transform);
        }
@@ -696,9 +692,6 @@ int main(int argc, char **argv)
         trajectory_point1 = generate_point(goal_point1, current_odom1, auxiliar_point, transform);
         trajectory_point2 = generate_point(goal_point2, current_odom2, auxiliar_point, transform);
         */
-
-
-
 
         obstacle_free = check_obstacles(trajectory, map_, auxiliar_point, transform);  // map.info.width // map.info.height // map.info.resolution
 
