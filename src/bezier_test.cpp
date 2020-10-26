@@ -709,8 +709,6 @@ int main(int argc, char **argv)
         chatter_map_point2.publish(trajectory_point2);
         */
 
-
-
         //chatter_map_array.publish(trajectory);
 
 
