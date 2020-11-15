@@ -195,7 +195,6 @@ nav_msgs::Path generate_path(geometry_msgs::PoseStamped goal_point, nav_msgs::Od
       (double)goal_point.pose.position.x, (double)goal_point.pose.position.y
   };
 
-
   geometry_msgs::PoseStamped pose;
   geometry_msgs::PoseStamped pose_map;
   geometry_msgs::Pose pose_array;
@@ -210,14 +209,6 @@ nav_msgs::Path generate_path(geometry_msgs::PoseStamped goal_point, nav_msgs::Od
 
 
      for ( int x = 0; x < 2048; x += 2 ) {
-
-
-         //Por cuaternios
-
-         //double w = cos (0.5*angle*PI/180);
-         //double x = p.x * sin (0.5*angle*PI/180);
-         //double y = p.y * sin (0.5*angle*PI/180);
-         //double z = p.z * sin (0.5*angle*PI/180);
 
          pose.pose.position.x = outputs[x];
          pose.pose.position.y = outputs[x+1];
@@ -243,7 +234,6 @@ nav_msgs::Path generate_path(geometry_msgs::PoseStamped goal_point, nav_msgs::Od
          pose_array.position.y = pose.pose.position.y + transform.getOrigin().y();
          pose_array.position.z = pose.pose.position.z + transform.getOrigin().z();
 
-
          pose_array.orientation.x = 0;
          pose_array.orientation.y = 0;
          pose_array.orientation.z = 0;
@@ -252,13 +242,7 @@ nav_msgs::Path generate_path(geometry_msgs::PoseStamped goal_point, nav_msgs::Od
          //array_map.poses.push_back(pose_array);
          path_map.poses.push_back(pose_map);
 
-         //path.poses[].pose.position
-
-         //chatter_pub.publish(msgy);
-
-         //Publicar un array de poses
      }
-
 
   return path_map;
 }
@@ -522,46 +506,6 @@ bool check_obstacles(nav_msgs::Path trajectory, nav_msgs::OccupancyGrid map_, ge
     }
 }
 
-/*void mapCallback(const nav_msgs::OccupancyGrid::ConstPtr& map )
-{
-    int index = 0;
-    float x = 0;
-    float y = 0;
-    int grid_x;
-    int grid_y;
-
-  //ROS_INFO("I heard: [%f]", map->data[0]);
-    //ROS_INFO("El valor del output es: [%f]",  path_map.poses[20].pose.position.x); //uint32 width
-    for (int i=0; i<1024; i++){
-        x = path_map.poses[i].pose.position.x;
-        y = path_map.poses[i].pose.position.y;
-
-        grid_x = x / 0.158 + 1345;
-        grid_y = y / 0.158 + 955;
-
-        index  = (grid_y*2651 + grid_x);
-
-        if(map->data[index] != 0){
-            ROS_INFO("Hay un obstáculo en [%f]",  x, y);
-        }
-        //map->data[i,j]
-
-    }
-
-
-    /*
-    for(int x=0; x<= map->info.width; x++){
-        for(int y=0; y<= map->info.height; y++){
-            index ++;
-            if (x == x_goal && y == y_goal){
-                map->data[index]
-
-            }
-        }
-    }
-    */
-//}
-
 int main(int argc, char **argv)
 {
 
@@ -748,9 +692,7 @@ int main(int argc, char **argv)
     //Defino path
     nav_msgs::Path path;
     //nav_msgs::Path path_map;
-
-
-
+    
     points.header.frame_id  = "/base_link";
     points.header.stamp = ros::Time::now();
     points.ns = "bezier";
@@ -774,8 +716,6 @@ int main(int argc, char **argv)
     //path_map.header.frame_id = "map";
     //path_map.header.stamp = ros::Time::now();
 
-
-
         //Me devuelve las x y las y. En forma de string
         std_msgs::String msgx;
         std_msgs::String msgy;
@@ -786,7 +726,6 @@ int main(int argc, char **argv)
 
         geometry_msgs::PoseStamped pose_map;
 
-
         /*
         p.x = (int32_t)i - 50;
         p.y = y;
@@ -795,8 +734,6 @@ int main(int argc, char **argv)
 
 
         for ( int x = 0; x < 2048; x += 2 ) {
-
-
             p.x = outputs[x];
             p.y = outputs[x+1];
             p.z = 0;
@@ -818,7 +755,6 @@ int main(int argc, char **argv)
             pose.pose.orientation.z = 0;
             pose.pose.orientation.w = 1.0; //Significa que no hay rotación.
 
-            //Otro sistema de poses en referencia a /map
             pose_map.pose.position.x = pose.pose.position.x + transform.getOrigin().x();
             pose_map.pose.position.y = pose.pose.position.y + transform.getOrigin().y();
             pose_map.pose.position.z = pose.pose.position.z + transform.getOrigin().z();
@@ -831,28 +767,13 @@ int main(int argc, char **argv)
 
             points.points.push_back(p);
             path.poses.push_back(pose);
-            //path_map.poses.push_back(pose_map);
 
             x_transformada = pose_map.pose.position.x;
             y_transformada = pose_map.pose.position.y;
-
-
-            //path.poses[].pose.position
-
-            //chatter_pub.publish(msgy);
         }
-
-
-        //marker_pub.publish(points);
-
 
         chatter_pub.publish(points);
         chatter_pub_path.publish(path);
-        //chatter_map_path.publish(path_map);
-        
-
-        //marker_pub.publish(points);
-
     }
 
     return 0;
