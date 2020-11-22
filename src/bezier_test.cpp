@@ -14,8 +14,6 @@
 #include <geometry_msgs/PoseArray.h>
 
 #define PI 3.14159265
-
-
 #define ARRAY_SIZE(x) (sizeof((x))/sizeof((x)[0]))
 
 using namespace std;
@@ -241,7 +239,6 @@ nav_msgs::Path generate_path(geometry_msgs::PoseStamped goal_point, nav_msgs::Od
 
          //array_map.poses.push_back(pose_array);
          path_map.poses.push_back(pose_map);
-
      }
 
   return path_map;

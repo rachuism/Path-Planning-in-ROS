@@ -120,14 +120,15 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/tfg.cpp
-# )
+ add_library(local_planner
+   src/local_planner.cpp
+ )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -156,8 +157,10 @@ include_directories(
 
 add_executable(bezier_final src/bezier_test.cpp)
 add_executable(odom_goal src/odom_and_goal.cpp)
+add_executable(base_local_planner src/local_planner.cpp)
 target_link_libraries(bezier_final ${catkin_LIBRARIES})
 target_link_libraries(odom_goal ${catkin_LIBRARIES})
+target_link_libraries(local_planner ${catkin_LIBRARIES})
 add_dependencies(bezier_final tfg_generate_messages_cpp)
 add_dependencies(odom_goal tfg_generate_messages_cpp)
 
