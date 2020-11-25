@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>base_local_planner</name>
+  <name>bezier_local_planner</name>
   <version>0.0.0</version>
   <description>The tfg_final package</description>
 
@@ -45,7 +45,6 @@
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
-  <nav_core plugin="${prefix}/global_planner_plugin.xml" />
   <nav_core plugin="${prefix}/plugin.xml"/>
   </export>
   <build_depend>nav_core</build_depend>

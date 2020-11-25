@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(base_local_planner)
+project(bezier_local_planner)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -126,7 +126,7 @@ include_directories(
 )
 
 ## Declare a C++ library
- add_library(base_local_planner
+ add_library(bezier_local_planner
    src/local_planner.cpp
  )
 
@@ -159,7 +159,12 @@ add_executable(bezier_final src/bezier_test.cpp)
 add_executable(odom_goal src/odom_and_goal.cpp)
 target_link_libraries(bezier_final ${catkin_LIBRARIES})
 target_link_libraries(odom_goal ${catkin_LIBRARIES})
-target_link_libraries(base_local_planner ${catkin_LIBRARIES})
+target_link_libraries(
+     bezier_local_planner 
+     ${catkin_LIBRARIES}
+     /opt/ros/noetic/lib/libbase_local_planner.so
+     /opt/ros/noetic/lib/librotate_recovery.so
+)
 add_dependencies(bezier_final tfg_generate_messages_cpp)
 add_dependencies(odom_goal tfg_generate_messages_cpp)
 
