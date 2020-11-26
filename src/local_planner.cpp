@@ -2,6 +2,7 @@
 #include <pluginlib/class_list_macros.h>
 
 #include <base_local_planner/goal_functions.h>
+#include <base_local_planner/costmap_model.h>
 
 
 PLUGINLIB_EXPORT_CLASS(bezier_local_planner::LocalPlanner, nav_core::BaseLocalPlanner)
