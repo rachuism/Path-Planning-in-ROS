@@ -120,9 +120,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
- include
-  ${catkin_INCLUDE_DIRS}
+  include
   ${Eigen_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -160,7 +160,6 @@ add_executable(odom_goal src/odom_and_goal.cpp)
 target_link_libraries(
      bezier_local_planner 
      ${catkin_LIBRARIES}
-     base_local_planner
 )
 target_link_libraries(bezier_final ${catkin_LIBRARIES})
 target_link_libraries(odom_goal ${catkin_LIBRARIES})
